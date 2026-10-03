@@ -9,6 +9,7 @@ columns of the electricity dataset and returns DataFrames / scalars
 ready for plotting or display.
 """
 
+import os
 import numpy as np
 import pandas as pd
 
@@ -33,7 +34,15 @@ DAY_ORDER = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
 # ======================================================================
 
 def load_data(path="data/electricity_consumption.csv"):
-    """Load the raw CSV and return a cleaned DataFrame."""
+    """Load the raw CSV and return a cleaned DataFrame.
+
+    Relative paths are resolved from this module's location, so the
+    function works whether it is called from the project root, the
+    repo root (Streamlit Cloud), or the notebooks/ directory.
+    """
+    if not os.path.isabs(path):
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        path = os.path.join(base_dir, path)
     df = pd.read_csv(path)
     df = clean_data(df)
     return df

@@ -9,6 +9,7 @@ Run:
     streamlit run app.py
 """
 
+import os
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -289,7 +290,11 @@ apply_custom_css()
 # ----------------------------------------------------------------------
 # Data loading (cached so filters feel instant)
 # ----------------------------------------------------------------------
-DATA_PATH = "data/electricity_consumption.csv"
+# Resolve the dataset path from this file's location, not the process
+# working directory. This makes the app work whether it is launched
+# from the repo root (Streamlit Cloud) or from the project folder.
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(BASE_DIR, "data", "electricity_consumption.csv")
 
 
 @st.cache_data
@@ -303,8 +308,7 @@ if not st.session_state.get("data_loaded", False):
         st.session_state["df_full"] = df_full
         st.session_state["data_loaded"] = True
     except FileNotFoundError:
-        st.error("Dataset not found. Run `python generate_dataset.py` first, "
-                 "then restart the dashboard.")
+        st.error(f"Dataset not found at: {DATA_PATH}")
         st.stop()
 else:
     df_full = st.session_state["df_full"]
